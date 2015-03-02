@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<link rel="stylesheet" href="/github-markdown.css">
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="/css/bootstrap-markdown.min.css">
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/3.0.6/markdown-it.js"></script>
+	<script src="/js/bootstrap-markdown.js"></script>
+	<script src="/emoji.js"></script>
+	<script src="//twemoji.maxcdn.com/twemoji.min.js"></script>
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+	<title><%=title%></title>
+	<style>
+	    .markdown-body {
+	        min-width: 200px;
+	        max-width: 790px;
+	        margin: 0 auto;
+	        padding: 30px;
+	    }
+	    .alignment{
+	    	min-width: 200px;
+	        max-width: 790px;
+	        margin: 0 auto;	
+	        text-align: right;
+	        padding-top: 15px;
+	    }
+	    img.emoji {
+		   height: 1em;
+		   width: 1em;
+		   margin: 0 .05em 0 .1em;
+		   vertical-align: -0.1em;
+		}
+	</style>
+</head>
+<body>
+	<div class="alignment">
+		<button class="btn btn-default" type="edit"><span class="glyphicon glyphicon-pencil"></span></button>
+	</div>
+	<div id="container">
+		<div class="markdown-body">
+			<%=pageContent%>
+		</div>
+	</div>
+	<script type="text/javascript">
+
+		var editing = false;
+		var editor = null;
+		$("button[type=edit]").click(function(evt){
+			var $btn = $("button[type=edit]");
+			if(editing){
+				$btn.html('<span class="glyphicon glyphicon-pencil"></span>');
+				editing = false;
+			}else{
+				$btn.html('<span class="glyphicon glyphicon-floppy-disk"></span>');
+				editing = true;
+				editor = $(".markdown-body").markdown({
+  					fullscreen: {enable: true},
+  					onShow: function(e){
+  						$.get("/raw" + document.location.pathname)
+  						.done(function(data){
+  							e.setContent(data);
+  						});
+  					},
+  					initialstate: 'fullscreen',
+  					additionalButtons: [
+									    [{
+									          name: "groupCustom",
+									          data: [{
+									            name: "cmdSave",
+									            toggle: true, // this param only take effect if you load bootstrap.js
+									            title: "Save",
+									            icon: "glyphicon glyphicon-floppy-disk",
+									            callback: function(e){
+									              var content = e.parseContent();
+									              $("#container").html('<div class="markdown-body">' + content + '</div>');
+									              $("body").removeClass("md-nooverflow");
+									              $btn.html('<span class="glyphicon glyphicon-pencil"></span>');
+												  editing = false;
+												  $.post(document.location.pathname, e.getContent());
+									            }
+									          }]
+									    }]
+									  ]
+  				});
+			}
+		});
+	</script>
+</body>
+</html>
