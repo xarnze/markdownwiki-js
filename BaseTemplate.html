@@ -63,35 +63,7 @@
 			}else{
 				$btn.html('<span class="glyphicon glyphicon-floppy-disk"></span>');
 				editing = true;
-				editor = $(".markdown-body").markdown({
-  					fullscreen: {enable: true},
-  					onShow: function(e){
-  						$.get("/raw" + document.location.pathname)
-  						.done(function(data){
-  							e.setContent(data);
-  						});
-  					},
-  					initialstate: 'fullscreen',
-  					additionalButtons: [
-									    [{
-									          name: "groupCustom",
-									          data: [{
-									            name: "cmdSave",
-									            toggle: true, // this param only take effect if you load bootstrap.js
-									            title: "Save",
-									            icon: "glyphicon glyphicon-floppy-disk",
-									            callback: function(e){
-									              var content = e.parseContent();
-									              $("#container").html('<div class="markdown-body">' + content + '</div>');
-									              $("body").removeClass("md-nooverflow");
-									              $btn.html('<span class="glyphicon glyphicon-pencil"></span>');
-												  editing = false;
-												  $.post(document.location.pathname, e.getContent());
-									            }
-									          }]
-									    }]
-									  ]
-  				});
+				editor = markdownEditor($(".markdown-body"), {});
 			}
 		});
 	</script>
