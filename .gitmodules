@@ -1,0 +1,3 @@
+[submodule "markdown-editor"]
+	path = markdown-editor
+	url = https://github.com/jbt/markdown-editor.git
