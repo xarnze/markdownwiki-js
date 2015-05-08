@@ -65,15 +65,41 @@
 
 		var editing = false;
 		var editor = null;
+		function endsWith(str, suffix) {
+			return str.indexOf(suffix, str.length - suffix.length) !== -1;
+		}
+		var md = markdownit().use(window.markdownitEmoji);
+		md.renderer.rules.link_open = function (tokens, idx) {
+          var title = tokens[idx].title ? (' title="' + replaceEntities(tokens[idx].title) + '"') : '';
+          var target = tokens[idx].target ? (' target="' + tokens[idx].target + '"') : '';
+          return '<a href="' + tokens[idx].href + '"' + title + target + '>' + ( (endsWith(tokens[idx].href, ".md") || endsWith(tokens[idx].href, "/")) || tokens[idx].href.indexOf('.') === -1 ? '' : '<img class="emoji" draggable="false" alt="⬇️" src="//twemoji.maxcdn.com/36x36/2b07.png"> ');
+        };
+        md.renderer.rules.emoji = function(token, idx) {
+          return twemoji.parse(token[idx].to);
+        };
 		$("button[type=edit]").click(function(evt){
 			var $btn = $("button[type=edit]");
 			if(editing){
 				$btn.html('<span class="glyphicon glyphicon-pencil"></span>');
 				editing = false;
+				$("#container").html('<div class="markdown-body">' + md.render(editor.getValue()) + '</div>');
+				$.post(document.location.pathname, editor.getValue());
 			}else{
 				$btn.html('<span class="glyphicon glyphicon-floppy-disk"></span>');
+				$.get("/raw" + document.location.pathname)
+  						.done(function(data){
+  							$(".markdown-body").html('<textarea id="code"></textarea>');
+							editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+						      mode: 'gfm',
+						      lineNumbers: false,
+						      matchBrackets: true,
+						      lineWrapping: true,
+						      theme: 'base16-light',
+						      value: data
+						    });
+						    editor.setValue(data);
+  						});
 				editing = true;
-				editor = markdownEditor($(".markdown-body"), {});
 			}
 		});
 	</script>
