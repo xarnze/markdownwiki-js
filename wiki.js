@@ -30,8 +30,31 @@ app.get("/js/bootstrap-markdown.js", function(req, res){
 	res.status(200).sendFile( __dirname + "/js/bootstrap-markdown.js");
 });
 
+app.get("/js/markdown-editor.js", function(req, res){
+	res.status(200).sendFile( __dirname + "/js/markdown-editor.js");
+});
+
 app.get("/css/bootstrap-markdown.min.css", function(req, res){
 	res.status(200).sendFile( __dirname + "/css/bootstrap-markdown.min.css");
+});
+
+app.get("/js/codemirror/*", function(req, res){
+	var filePath = querystring.unescape(req.path);
+	fs.exists(__dirname + filePath, function(exists){
+		if(exists){
+			var reqPath = __dirname + filePath;
+			fs.readFile(reqPath, function (err, data) {
+				if (err) {
+					console.log(err);
+					return;
+				}
+				res.set('Content-Type', 'text/css');
+				res.send(data.toString());
+			});
+		}else{
+			res.status(404).send("Not Found");
+		}
+	});
 });
 
 app.get("/raw/*", function(req, res){
@@ -133,7 +156,7 @@ app.post("/*", function(req, res){
     });
 });
 
-var server = app.listen(88, function(){
+var server = app.listen(89, function(){
 
 	var host = server.address().address;
 	var port = server.address().port;
