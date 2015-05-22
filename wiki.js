@@ -8,6 +8,12 @@ var emoji = require('markdown-it-emoji');
 md.use(emoji);
 var twemoji = require('twemoji');
 
+md.renderer.rules.link_open = function (tokens, idx) {
+  var title = tokens[idx].title ? (' title="' + replaceEntities(tokens[idx].title) + '"') : '';
+  var target = tokens[idx].target ? (' target="' + tokens[idx].target + '"') : '';
+  return '<a href="' + tokens[idx].href + '"' + title + target + '>' + ( (endsWith(tokens[idx].href, ".md") || endsWith(tokens[idx].href, "/")) || tokens[idx].href.indexOf('.') === -1 ? '' : '<img class="emoji" draggable="false" alt="⬇️" src="//twemoji.maxcdn.com/36x36/2b07.png"> ');
+};
+
 md.renderer.rules.emoji = function(token, idx) {
   return twemoji.parse(token[idx].to);
 };
